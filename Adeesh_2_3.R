@@ -22,7 +22,6 @@ unique(service_requests$PolicePrecinct) ### 22 levels - might be relevant for ce
 
 ## Investigation 1
 ## Investigating trends in call vs app counts over 2016
-
 phoneapp <- service_requests %>%
   mutate(type = ifelse(RequestSource %in% c("Call","Voicemail","Queue Initiated Customer Call"), "phone",
                        ifelse(RequestSource == "Mobile App", "app", 0)))
@@ -65,11 +64,8 @@ phonevsapp_overtime = ggplot(timetrend_phonevsapp_final, aes(x = factor(month), 
   xlab("Month in 2016")+
   ylab("Percent of Requests")
 ### in general phone call usage has gone down about 5% in place of app usage 
-
-
 ####### 1 #########
 grid.arrange(timetrend_requestcount, phonevsapp_overtime, nrow = 1)   #### can use this in presentation
-
 
 
 ### Investigation 2
@@ -90,7 +86,7 @@ service_requests%>%
   arrange(-percent)
 
 
-#### 60% of all graffiti removal requests tend to come in from non phone or app requests.
+#### Comparing Graffiti Removal vs Bulky Items by Request Source 
 graffit_byrequestsource =
   service_requests%>%
   group_by(RequestType,RequestSource )%>%
@@ -103,8 +99,6 @@ graffit_byrequestsource =
   xlab("Request Source")+
   ggtitle("Count of Graffiti Removal Requests by Source")+
   ylab("Count of Graffiti Removal Requests")
-
-### the above is very different than the trend for Bulky Item removal requests (50% of all requests are for bulky items)
 
 bulkyitem_byrequestsource =
   service_requests%>%
@@ -119,15 +113,10 @@ bulkyitem_byrequestsource =
   ggtitle("Count of Bulky Item Removal Requests by Source")+
   ylab("Count of Bulky Item Removal Requests")
 
-
 ##### 2 ######
 grid.arrange(bulkyitem_byrequestsource,graffit_byrequestsource, nrow =1)
 
-
-
-### Investigation 3
-
-
+### Investigation 3 - Time trends, bulky-item vs graffiti removal
 ### The top 2 request types includes 70% of all phone or app requests
 phoneapp%>%
   group_by(RequestType)%>%
@@ -149,7 +138,6 @@ a = ggplot(timetrend_requesttype, aes(x = factor(month), y = count, fill = Reque
   xlab("Month of 2016")+
   ylab("Count of Service Requests by Request Type - 2016")
 
-#### 2 continued
 month_total = phoneapp %>%
   filter(year == "2016")%>%
   group_by(month)%>%
@@ -165,24 +153,19 @@ b = ggplot(timetrend_requesttype_merged, aes(x = factor(month), y = percent, fil
   xlab("Month of 2016")+
   ylab("Percent")
 
-grid.arrange(a,b,nrow=1)
-
 ##### 3 ######
+grid.arrange(a,b,nrow=1)
 
 ### We notice that bulky item removal peaks during August - this might be due to college move-in / move-out / (back-to-school)
 ### Thus could prepare additional staffing for those months for bulky removal, or create city-wide incentives not to
 ### We may also look at gegraphic breakdown to see whether these bulky item removal requests are close to college campuses
 
-
-
-
 ### Investigation 4 - Service request efficiency, phone vs app
-
 View(phoneapp)
 phoneapp$serviceefficiency = 
   (phoneapp$UpdatedDate - phoneapp$CreatedDate)/86400 ##(converting from seconds to days)
 
-#### 4 ######
+#### 4a ######
 ggplot(phoneapp, aes(x=serviceefficiency, fill = type))+
   geom_histogram(position = "dodge", bins = 10)+
   xlim(c(0, 8))+
@@ -190,8 +173,7 @@ ggplot(phoneapp, aes(x=serviceefficiency, fill = type))+
   ylab("Count of Requests")+
   ggtitle("Service Efficiency by Request Source")
   
-#### Average Update time / Response Time
-
+#### Average Update time / Response Time - 4b ####
 phoneapp%>%
   filter(type == "app")%>%
   mutate(averagetime = mean(serviceefficiency))
@@ -199,21 +181,14 @@ phoneapp%>%
 phoneapp%>%
   filter(type == "phone")%>%
   mutate(averagetime = mean(serviceefficiency))
-### 4.13 days (not seconds)
-#### we can go into what kind of requests take long to update
-
-
-
+### 4.13 days 
+#### we can go deeper into what kind of requests take long to update
 
 ### Potential Next steps
-
 ### 1 - certain areas need more graffiti removal, maybe city
 ###     areas have more need for bulky item movement
-
 ### 2 Count of requests by app vs phone - plot it on a map (use cd, or apc variable or zipcodes/lat-lon)
-
 ### 3 Analyze open requests (~3% of total), what are they for - what type of request / phone or app or other type? / what location?
-
 ## 4 Service Request Type for Each Input Channel - Paige did this - graffiti removal coming in through the 
 ## app, and the bulky item request coming in through the phone mostly
 ## Combine into one chart, using grid.arrange
